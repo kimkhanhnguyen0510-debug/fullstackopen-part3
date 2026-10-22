@@ -6,7 +6,7 @@ const persons = require('./persons')
 const PORT = process.env.PORT || 3001
 
 app.use(express.json())
-
+app.use(express.static('dist'))
 morgan.token('body', (req) => JSON.stringify(req.body))
 app.use(morgan(':method :url :status :body'))
 
