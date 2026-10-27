@@ -12,11 +12,13 @@ const App = () => {
   const [search, setSearch] = useState('')
 
   useEffect(() => {
-    personService
-      .getAll()
-      .then(persons => {
-        setPersons(persons)
-      })
+  personService
+    .getAll()
+    .then(persons => {
+      console.log('Data from backend:', persons)
+      console.log('Is array:', Array.isArray(persons))
+      setPersons(persons)
+    })
   }, [])
 
   const handleNameChange = (event) => {
@@ -54,7 +56,7 @@ const App = () => {
           })
           .catch(error => {
             setNotification({
-              message: `Information of ${existingPerson.name} has already been removed from server`,
+              message: error.response.data.error,
               type: 'error'
             })
             setTimeout(() => {
@@ -79,7 +81,7 @@ const App = () => {
         })
         .catch(error => {
             setNotification({
-              message: `Information of ${existingPerson.name} has already been removed from server`,
+              message: error.response.data.error,
               type: 'error'
             })
             setTimeout(() => {
@@ -96,7 +98,8 @@ const App = () => {
 
   const filteredPersons = persons.filter(person => person.name.toLowerCase().includes(search.toLowerCase()))
 
-  const handleDelete = (id) => { 
+  const handleDelete = (id) => {
+    const personToDelete = persons.find(person => person.id === id)
     if (window.confirm('Are you sure you want to delete this person?')) {
       personService
         .remove(id)
@@ -105,7 +108,7 @@ const App = () => {
         })
         .catch(error => {
             setNotification({
-              message: `Information of ${existingPerson.name} has already been removed from server`,
+              message: `Information of ${personToDelete.name} has already been removed from server`,
               type: 'error'
             })
             setTimeout(() => {
@@ -119,7 +122,7 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       <Notification notification={notification} />
-      <Filter searchName={searchName} />
+      <Filter search={search} searchName={searchName} />
       <h3>Add a new</h3>
       <PersonForm
         newName={newName}
@@ -138,10 +141,10 @@ const App = () => {
   )
 }
 
-const Filter = ({ searchName }) => {
+const Filter = ({ search, searchName }) => {
   return (
     <div>
-      filter shown with <input onChange={searchName} />
+      filter shown with <input value={search} onChange={searchName} />
     </div>
   )
 }
