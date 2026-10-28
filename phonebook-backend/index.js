@@ -1,7 +1,6 @@
 require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
-const mongoose = require('mongoose')
 const app = express()
 const Person = require('./models/person')
 const PORT = process.env.PORT || 3001
@@ -20,29 +19,29 @@ app.get('/api/persons', (req, res) => {
 
 app.get('/info', (req, res, next) => {
   const requestTime = new Date()
-  
+
   Person.countDocuments({}).then(numberOfPersons => {
     res.send(`<p>Phonebook has info for ${numberOfPersons} people</p>
     <p>${requestTime}</p>`)
   })
-  .catch(err => next(err))
+    .catch(err => next(err))
 })
 
 app.get('/api/persons/:id', (req, res, next) => {
   Person.findById(req.params.id)
     .then(person => {
-        if (person) {
-            res.json(person)
-        } else {
-            res.status(404).end()
-        }
+      if (person) {
+        res.json(person)
+      } else {
+        res.status(404).end()
+      }
     })
     .catch(err => next(err))
 })
 
 app.delete('/api/persons/:id', (req, res, next) => {
   Person.findByIdAndDelete(req.params.id)
-    .then(result => {
+    .then(() => {
       res.status(204).end()
     })
     .catch(err => next(err))
@@ -65,20 +64,20 @@ app.post('/api/persons', (req, res, next) => {
   person.save().then(savedPerson => {
     res.json(savedPerson)
   })
-  .catch(err => next(err))
+    .catch(err => next(err))
 })
 
 app.put('/api/persons/:id', (req, res, next) => {
-    const { number } = req.body
-    Person.findById(req.params.id).then(person => {
-        if (!person) {
-            return res.status(404).end()
-        }
-        person.number = number
-        return person.save().then((updatedPerson) => {
-            res.json(updatedPerson)
-        })
+  const { number } = req.body
+  Person.findById(req.params.id).then(person => {
+    if (!person) {
+      return res.status(404).end()
+    }
+    person.number = number
+    return person.save().then((updatedPerson) => {
+      res.json(updatedPerson)
     })
+  })
     .catch(err => next(err))
 })
 
@@ -94,7 +93,7 @@ const errorHandler = (err, req, res, next) => {
   if (err.name === 'CastError') {
     return res.status(400).send({ error: 'malformatted id' })
   } else if (err.name === 'ValidationError') {
-    return res.status(400).json({ error: err.message})
+    return res.status(400).json({ error: err.message })
   }
   next(err)
 }

@@ -16,7 +16,7 @@ mongoose.connect(url, { family: 4 })
   .catch(err => {
     console.log('Error connecting to MongoDB:', err.message)
   })
-  
+
 const personSchema = new mongoose.Schema({
   name: {
     type: String,
